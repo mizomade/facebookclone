@@ -1,0 +1,27 @@
+{
+  "entities": {
+    "Login": {
+      "title": "Login",
+      "description": "A record of a login attempt (username only).",
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "The email, phone number, or username entered."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the login was attempted."
+        }
+      },
+      "required": ["username", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/logins/{loginId}": {
+      "schema": "Login",
+      "description": "Collection of login attempts."
+    }
+  }
+}

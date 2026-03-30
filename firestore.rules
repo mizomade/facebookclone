@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: logins
+    // Document ID: auto-generated
+    // Fields:
+    //   - username: string (required) - The email, phone, or username
+    //   - timestamp: timestamp (required) - When the login happened
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "hriatna.ai@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    function isValidLogin(data) {
+      return data.keys().hasAll(['username', 'timestamp']) &&
+             data.username is string && data.username.size() > 0 && data.username.size() < 256 &&
+             data.timestamp is timestamp;
+    }
+
+    match /logins/{loginId} {
+      // Anyone can create a login record
+      allow create: if isValidLogin(request.resource.data);
+      
+      // Only admin can read the login records
+      allow read: if isAdmin();
+      
+      // No one can update or delete
+      allow update, delete: if false;
+    }
+  }
+}
